@@ -3,10 +3,16 @@ import {
   FETCH_RENTAL_BYID,
   FETCH_RENTAL_BYID_INIT,
   LOGIN_USER_SUCCESS,
-  LOGIN_USER_FAILURE
+  LOGIN_USER_FAILURE,
+  LOGOUT
 } from "./types";
 import axios from "axios";
 import { baseUrlRemote, baseUrlLocal } from "../helpers";
+import authService from "../services/auth-service";
+import axiosService from "../services/axios-service";
+
+
+const axiosInstance = axiosService.getInstance();
 
 export const fetchRentals = rentals => {
   return {
@@ -30,8 +36,10 @@ const fetchRentalById = rental => {
 
 export const getRentals = () => {
   return function(dispatch) {
-    axios
-      .get(baseUrlLocal + "/api/rentals")
+    // axios
+    //   .get(baseUrlLocal + "/api/rentals")
+    axiosInstance
+      .get('/rentals')
       .then(res => res.data)
       .then(rentals => {
         return dispatch(fetchRentals(rentals));
@@ -93,3 +101,18 @@ export const loginUser = userData => {
       });
   };
 };
+
+export const checkAuth = () =>{
+  return dispatch =>{
+    if(authService.isAuthenticated()){
+      dispatch(loginSuccess())
+    }
+  }
+}
+
+export const logout = () =>{
+  authService.logout()
+  return {
+    type: LOGOUT
+  }
+}
